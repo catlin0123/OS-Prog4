@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-import process_scheduler_view
+from process_scheduler_view import *
 
 #set up the window
 root = Tk()
@@ -20,7 +20,7 @@ notebook.add(mem_man, text = "Memory Managment Unit")
 notebook.add(page_rep, text = "Page Replacement")
 
 #set up the view for the process scheduler tab
-process_scheduler_view.create_scheduler_view(proc_sched)
+create_scheduler_view(proc_sched)
 
 #set up the view for the memory management unit tab
 

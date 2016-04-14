@@ -1,49 +1,88 @@
 from tkinter import *
 from tkinter import ttk
 
-"""
-def add_process_row(frame):
-    add_process_row.num_rows++
-    
-add_process_row.num_rows = 0
-""" 
+number_of_rows = 0
+process_list = []
 
+def add_process_row(frame):
+    global number_of_rows
+    number_of_rows += 1
+    row_num = number_of_rows
+
+    burst_time = IntVar()
+    priority = IntVar()
+    arr_time = IntVar()
+
+    ttk.Label(frame, text="Process " + str(row_num)).grid(row=row_num, column=0) 
+    ttk.Entry(frame, textvariable=burst_time).grid(row=row_num, column=1)
+    ttk.Entry(frame, textvariable=priority).grid(row=row_num, column=2)
+    ttk.Entry(frame, textvariable=arr_time).grid(row=row_num, column=3)
+    frame.pack()
+
+    global process_list
+    process_list.append([burst_time, priority, arr_time])
+
+def parse_and_run_alg(radio_val, time_quanta):
+    global process_list
+    
+    try:
+        quanta = time_quanta.get()
+    except ValueError:
+        print ("quanta is incorrect")
+
+    print(process_list)
+
+    int_list = []
+    for row in process_list:
+        inner_list = []
+        for column in row:
+            try:
+                current = column.get()
+                inner_list.append(current)
+            except ValueError:
+                inner_list.append(0)
+        int_list.append(inner_list)
+
+    if radio_val == 0:
+        print ("FCFS")
+    elif radio_val == 1:
+        print ("SJF")
+    elif radio_val == 2:
+        print ("priority")
+    elif radio_val == 3:
+        print ("RR")
+    
 
 def create_scheduler_view(proc_sched):
-    s_radio_var = IntVar()
-    s_l1 = ttk.Label(proc_sched, text="Algoritm:")
-    s_l1.pack(anchor = W)
+    radio_var = IntVar()
+    ttk.Label(proc_sched, text="Algoritm:").pack(anchor = W)
 
     #algorithm type setup
-    s_r1 = ttk.Radiobutton(proc_sched, text="First Come First Serve", variable=s_radio_var, value=0)
-    s_r2 = ttk.Radiobutton(proc_sched, text="Shortest Job First", variable=s_radio_var, value=1)
-    s_r3 = ttk.Radiobutton(proc_sched, text="Priority", variable=s_radio_var, value=2)
-    s_r4 = ttk.Radiobutton(proc_sched, text="Round Robin", variable=s_radio_var, value=3)
-    s_r1.pack(anchor = W)
-    s_r2.pack(anchor = W)
-    s_r3.pack(anchor = W)
-    s_r4.pack(anchor = W)
+    ttk.Radiobutton(proc_sched, text="First Come First Serve", variable=radio_var, value=0).pack(anchor = W)
+    ttk.Radiobutton(proc_sched, text="Shortest Job First", variable=radio_var, value=1).pack(anchor = W)
+    ttk.Radiobutton(proc_sched, text="Priority", variable=radio_var, value=2).pack(anchor = W)
+    ttk.Radiobutton(proc_sched, text="Round Robin", variable=radio_var, value=3).pack(anchor = W)
 
-    s_l2 = ttk.Label(proc_sched, text="Time Quanta:")
-    s_l2.pack(anchor = E)
+    #time quantum setup
+    q_frame = ttk.Frame(proc_sched)
+    ttk.Label(q_frame, text="Time Quanta:").grid(row=0, column=0)
+    quanta_var = IntVar()
+    ttk.Entry(q_frame, textvariable=quanta_var).grid(row=0, column=1)
+    q_frame.pack()
 
-    s_e1 = ttk.Entry(proc_sched, width=10)
-    s_e1.pack()
-
-    s_b1 = ttk.Button(proc_sched, text="Add")
-    s_b1.pack()
-
+    #process info setup
     s_frame = ttk.Frame(proc_sched)
-    s_l3 = ttk.Label(proc_sched, text="Process")
-    s_l3.pack() #change to a grid
-    s_l4 = ttk.Label(proc_sched, text="BurstTime")
-    s_l4.pack() #change to a grid
-    s_l5 = ttk.Label(proc_sched, text="Priority")
-    s_l5.pack() #change to a gird
-    s_l6 = ttk.Label(proc_sched, text="Arrival Time")
-    s_l6.pack() #change to a grid
+    ttk.Label(s_frame, text="Process").grid(row=0, column=0) 
+    ttk.Label(s_frame, text="Burst Time").grid(row=0, column=1)
+    ttk.Label(s_frame, text="Priority").grid(row=0, column=2)
+    ttk.Label(s_frame, text="Arrival Time").grid(row=0, column=3)
+    s_frame.pack()
 
-#    add_process_row(s_frame)
+    add_process_row(s_frame)
 
-    s_b2 = ttk.Button(proc_sched, text="Run")
-    s_b2.pack() 
+    #button setup
+    b_frame = ttk.Frame(proc_sched)
+    ttk.Button(b_frame, text="Add", command=lambda: add_process_row(s_frame)).grid(row=0, column=0)
+    ttk.Button(b_frame, text="Run", command=lambda: parse_and_run_alg(radio_var.get(), quanta_var)).grid(row=0, column=1)
+    b_frame.pack()
+    
