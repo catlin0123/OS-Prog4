@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from process_scheduler import *
 
 number_of_rows = 0
 process_list = []
@@ -30,11 +31,11 @@ def parse_and_run_alg(radio_val, time_quanta):
     except ValueError:
         print ("quanta is incorrect")
 
-    print(process_list)
-
     int_list = []
+    i = 1;
     for row in process_list:
         inner_list = []
+        inner_list.append(i)
         for column in row:
             try:
                 current = column.get()
@@ -42,15 +43,16 @@ def parse_and_run_alg(radio_val, time_quanta):
             except ValueError:
                 inner_list.append(0)
         int_list.append(inner_list)
+        i += 1
 
     if radio_val == 0:
-        print ("FCFS")
+        fcfs(int_list)
     elif radio_val == 1:
-        print ("SJF")
+        sjf(int_list)
     elif radio_val == 2:
-        print ("priority")
+        priority(int_list)
     elif radio_val == 3:
-        print ("RR")
+        rr(int_list, quanta)
     
 
 def create_scheduler_view(proc_sched):
