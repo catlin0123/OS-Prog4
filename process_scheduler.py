@@ -16,11 +16,6 @@ def sjf(processes):
     return_list = []
     processes.sort(key=lambda x: x[3]) #sort by burst time
     current_time = 0
-    while (len(processes) > 0)
-    {
-    
-    
-    }
     return
 
 def priority(processes):
