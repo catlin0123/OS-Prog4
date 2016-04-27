@@ -1,11 +1,13 @@
 from tkinter import *
 from tkinter import ttk
 from process_scheduler_view import *
+from mem_management_view import *
+from page_replacement_view import *
 
 #set up the window
 root = Tk()
 root.title("Operating System Simulation")
-root.geometry("500x300")
+root.geometry("1000x800")
 
 #set up the tab structure
 notebook = ttk.Notebook(root)
@@ -23,18 +25,15 @@ notebook.add(page_rep, text = "Page Replacement")
 create_scheduler_view(proc_sched)
 
 #set up the view for the memory management unit tab
-
-l2 = ttk.Label(mem_man, text="In Memory Management Unit")
-l2.pack()
+create_mem_management_view(mem_man)
 
 #set up the view for the page replacement tab
-l3 = ttk.Label(page_rep, text="In Page Replacement")
-l3.pack()
+create_page_replacement_view(page_rep)
 
 #proc_sched.pack() 
 #mem_man.pack()
 #page_rep.pack() 
 
-notebook.pack(side=TOP)
+notebook.pack(fill=BOTH, expand=1)
 
 root.mainloop()
