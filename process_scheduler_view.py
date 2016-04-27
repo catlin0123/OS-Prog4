@@ -22,15 +22,25 @@ def add_process_row(frame):
 
     global process_list
     process_list.append([burst_time, priority, arr_time])
-
-def parse_and_run_alg(radio_val, time_quanta, canvas):
-    global process_list
     
-    try:
-        quanta = time_quanta.get()
-    except ValueError:
-        print ("quanta is incorrect")
+def clear_process_row(s_frame):
+    for w in s_frame.winfo_children():
+        w.destroy()
+        
+    ttk.Label(s_frame, text="Process").grid(row=0, column=0) 
+    ttk.Label(s_frame, text="Burst Time").grid(row=0, column=1)
+    ttk.Label(s_frame, text="Priority").grid(row=0, column=2)
+    ttk.Label(s_frame, text="Arrival Time").grid(row=0, column=3)
+    
+    global number_of_rows
+    number_of_rows = 0
+    add_process_row(s_frame)
+    
 
+def parse_and_run_alg(radio_val, time_quanta, canvas, error):
+    error.set("")
+    global process_list
+        
     int_list = []
     i = 1;
     for row in process_list:
@@ -40,8 +50,9 @@ def parse_and_run_alg(radio_val, time_quanta, canvas):
             try:
                 current = column.get()
                 inner_list.append(current)
-            except ValueError:
-                inner_list.append(0)
+            except TclError:
+                error.set("Process information is incorrect. All values must be integers.")
+                return
         int_list.append(inner_list)
         i += 1
 
@@ -52,12 +63,24 @@ def parse_and_run_alg(radio_val, time_quanta, canvas):
     elif radio_val == 2:
         list = priority(int_list)
     elif radio_val == 3:
+        try:
+            quanta = time_quanta.get()
+        except TclError:
+            error.set("Quanta is not a valid integer.")
+            return
+
+        if quanta <= 0:
+            error.set("Quanta must be greater than 0")
+            return
         list = rr(int_list, quanta)
-    print (list)
+    
     canvas.delete(ALL)
     run_time = 0
     for i in list:
         run_time += i[1]
+        
+    if run_time == 0:
+        return
     
     spacing = 600/run_time
     canvas.create_rectangle(1, 1, 600, 50, fill='white')
@@ -73,7 +96,8 @@ def parse_and_run_alg(radio_val, time_quanta, canvas):
             canvas.create_text( x_value, 50, anchor=NE, text = curr_time)
         else:
             canvas.create_text( x_value, 50, anchor=N, text = curr_time)
-        canvas.create_text((p_x_value + x_value) / 2, 25, text = "P" + str(i[0]))
+        if i[0] != 0:
+            canvas.create_text((p_x_value + x_value) / 2, 25, text = "P" + str(i[0]))
         index += 1
     return
 
@@ -105,12 +129,16 @@ def create_scheduler_view(proc_sched):
     add_process_row(s_frame)
     
     can = Canvas(proc_sched, width=600, height=100)
+    error = StringVar()
 
     #button setup
     b_frame = ttk.Frame(proc_sched)
     ttk.Button(b_frame, text="Add", command=lambda: add_process_row(s_frame)).grid(row=0, column=0)
-    ttk.Button(b_frame, text="Run", command=lambda: parse_and_run_alg(radio_var.get(), quanta_var, can)).grid(row=0, column=1)
+    ttk.Button(b_frame, text="Clear", command=lambda: clear_process_row(s_frame)).grid(row=0, column=1)
+    ttk.Button(b_frame, text="Run", command=lambda: parse_and_run_alg(radio_var.get(), quanta_var, can, error)).grid(row=0, column=2)
     b_frame.pack()
+   
+    ttk.Label(proc_sched, textvariable=error).pack()
     
     can.pack()
     

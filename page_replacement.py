@@ -107,7 +107,7 @@ def fill(list, num_frames):
     return_list = []
     space_in_list = num_frames
     index = 0;
-    while space_in_list != 0:
+    while space_in_list != 0 and len(list) != len(return_list):
         if space_in_list == num_frames:
             l = [-1] * num_frames
             l[0] = list[0]

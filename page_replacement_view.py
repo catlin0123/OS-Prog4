@@ -5,7 +5,20 @@ from random import *
 
 
 
-def run_alg(alg, page, frame, mem, ref, ref_clear, disp_frame):
+def run_alg(alg, page, frame, mem, ref_clear, disp_frame, error):
+    error.set("")
+    try:
+        num_ref = mem.get()
+        pg = page.get()
+        fr = frame.get()
+    except TclError:
+        error.set("All values must be integers.")
+        return
+        
+    if num_ref <= 0 or pg <= 0 or fr <= 0:
+        error.set("All values must be greater 0")
+        return
+
     for w in disp_frame.winfo_children():
         w.destroy()
     ttk.Label(disp_frame, text = "Reference String:").grid(row = 0, column = 0)
@@ -14,21 +27,29 @@ def run_alg(alg, page, frame, mem, ref, ref_clear, disp_frame):
     list = []
     ref_str = ""; 
     for i in range(0, num_ref):
-        ref_to = randint(0, page.get() - 1)
+        ref_to = randint(0, pg - 1)
         list.append(ref_to)
         ttk.Label(disp_frame, text = str(ref_to)).grid(row = 0, column = i + 1)
     
     disp_list = []
     if alg == 0: 
-        dis_list = fifo(list, frame.get())
+        dis_list = fifo(list, fr)
     elif alg == 1: 
-        dis_list = optimal(list, frame.get())
+        dis_list = optimal(list, fr)
     elif alg == 2:
-        dis_list = lru(list, frame.get())
+        dis_list = lru(list, fr)
     elif alg == 3:
-        dis_list = lfu(list, frame.get(), page.get())
+        dis_list = lfu(list, fr, pg)
     else: 
-       dis_list =  nru(list, frame.get(), ref_clear.get())
+        try:
+            rc = ref_clear.get()
+        except TclError:
+            error.set("All values must be integers.")
+            return
+        if rc <= 0:
+            error.set("All values must be greater than 0")
+            return
+        dis_list =  nru(list, frame, rc)
        
     row = 1
     col = 1
@@ -74,11 +95,11 @@ def create_page_replacement_view(page_repl):
     q_frame.pack()
     
     disp_frame = ttk.Frame(page_repl)
-    reference_str = StringVar()
+    error = StringVar()
    
-    ttk.Button(page_repl, text="Run", command=lambda: run_alg(radio_var.get(), page_var, frame_var, mem_acc_var, reference_str, ref_clear, disp_frame)).pack()
+    ttk.Button(page_repl, text="Run", command=lambda: run_alg(radio_var.get(), page_var, frame_var, mem_acc_var, ref_clear, disp_frame, error)).pack()
         
-    ttk.Label(page_repl, textvariable=reference_str).pack()
+    ttk.Label(page_repl, textvariable=error).pack()
     disp_frame.pack()
     
     
