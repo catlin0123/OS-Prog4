@@ -22,7 +22,6 @@ def run_alg(alg, page, frame, mem, ref_clear, disp_frame, error):
     for w in disp_frame.winfo_children():
         w.destroy()
     ttk.Label(disp_frame, text = "Reference String:").grid(row = 0, column = 0)
-    ttk.Label(disp_frame, text = "Frames:").grid(row = 1, column = 0)
     num_ref = mem.get()
     list = []
     ref_str = ""; 
@@ -32,6 +31,8 @@ def run_alg(alg, page, frame, mem, ref_clear, disp_frame, error):
         ttk.Label(disp_frame, text = str(ref_to)).grid(row = 0, column = i + 1)
     
     disp_list = []
+    
+    row_val = 1
     if alg == 0: 
         dis_list = fifo(list, fr)
     elif alg == 1: 
@@ -41,6 +42,17 @@ def run_alg(alg, page, frame, mem, ref_clear, disp_frame, error):
     elif alg == 3:
         dis_list = lfu(list, fr, pg)
     else: 
+        rw = []
+        for i in range(0, num_ref):
+            ref_to = randint(0, 1)
+            rw.append(ref_to)
+            s = ""
+            if ref_to == 0: 
+                s = "r"
+            else:
+                s = "w"
+            ttk.Label(disp_frame, text = s).grid(row = 1, column = i + 1)
+        row_val +=1
         try:
             rc = ref_clear.get()
         except TclError:
@@ -49,12 +61,12 @@ def run_alg(alg, page, frame, mem, ref_clear, disp_frame, error):
         if rc <= 0:
             error.set("All values must be greater than 0")
             return
-        dis_list =  nru(list, frame, rc)
+        dis_list =  nru(list, rw, fr, pg, rc)
        
-    row = 1
+    ttk.Label(disp_frame, text = "Frames:").grid(row = row_val, column = 0)
     col = 1
     for column in dis_list:
-        row = 1
+        row = row_val
         for cell in column:
             if (cell != -1):
                 ttk.Label(disp_frame, text=cell).grid(row =row, column=col)
