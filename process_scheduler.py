@@ -49,22 +49,33 @@ def priority(processes):
 
 def rr(processes, quanta):
     processes.sort(key=lambda x: x[3]) #sort by arrival time
-    return_list = []
     current_time = 0
-    i = 0
-    while len(processes) != 0: 
-        if current_time < processes[i][3]:
-            return_list.append([0, processes[i][3] - current_time])
-            current_time += processes[i][3] - current_time
-        if processes[i][1] <= quanta: 
-            return_list.append([processes[i][0], processes[i][1]])
-            current_time += processes[i][1]
-            processes.pop(i)
+    queue = []
+    return_list = []
+    app = []
+
+    while len(processes) != 0 or len(queue) != 0 or len(app) != 0: 
+        if len(processes) != 0 and current_time < processes[0][3] and len(queue) == 0:
+            return_list.append([0, processes[0][3] - current_time])
+            current_time += processes[0][3] - current_time
+        
+        while len(processes) != 0 and processes[0][3] <= current_time: 
+            queue.append(processes[0])
+            processes.pop(0)
+        
+        for x in app:
+            queue.append(x)
+        app = []
+        
+        if queue[0][1] <= quanta: 
+            return_list.append([queue[0][0], queue[0][1]])
+            current_time += queue[0][1]
+            queue.pop(0)
         else:
-            return_list.append([processes[i][0], quanta])
+            return_list.append([queue[0][0], quanta])
             current_time += quanta
-            processes[i][1] -= quanta
-            i += 1
-        if i >= len(processes):
-            i = 0;     
+            queue[0][1] -= quanta
+            app.append(queue[0])
+            queue.pop(0)
+            
     return return_list

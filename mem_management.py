@@ -1,47 +1,48 @@
 from random import *
 import copy
 
-def run_tlb_manager(pg, fm, mem, tlb):
-    lookup = [0] * tlb
-    return_list = []
-    last_lookups = []
+references = []
+
+def setup_tables(tlb_size, num_pgs, num_fr):
+    pg_ref = []
+    fr_ref = []
+    pg = []
+    fr = [-1] * num_fr
     
-    #prefill the table to not end up with a large start up cost
-    for i in range(0, tlb):
-        lookup[i] = i
+    free = list(range(num_fr))
+    for i in range(0, num_pgs):
+        index = randint(0, len(free) - 1)
+        pg.append(free[index])
+        fr[free[index]] = i
+        free.pop(index)
     
-    for i in range(0, mem):
-        cur_pg = next_pg(last_lookups, pg)
-        last_lookups.append(cur_pg)
-        
-        if cur_pg in lookup:
-            return_list.append(1)
-        else:
-            l = copy.copy(last_lookups[0:i])
-            l.reverse()
-            index_of_next_access = []
-            for x in lookup: 
-                try:
-                    next = l.index(x)
-                    index_of_next_access.append(next)
-                except:
-                    index_of_next_access.append(1000000000000000)
-            index_to_change = index_of_next_access.index(max(index_of_next_access))
-            lookup[index_to_change] = cur_pg
-            return_list.append(0)
-           
+    free = list(range(num_pgs))
+    x = min(tlb_size, num_pgs)
+    for i in range(0, x):
+        index = randint(0, len(free) - 1)
+        pg_ref.append(free[index])
+        fr_ref.append(pg[free[index]])
+        free.pop(index)
+    tlb = [pg_ref, fr_ref]
     
-    return return_list
+    return [tlb, pg, fr]
+
+def run_tlb_manager(tlb, pg, fm):
+    global references
+ 
+    cur_pg = randint(0, len(pg) -1)
+    references.append(cur_pg)
     
-def next_pg (last, pg):
-    is_local = randint(0, 4)
-    if is_local == 0 or len(last) == 0: 
-        return randint(0, pg)
+    if cur_pg in tlb[0]:
+        return [1, tlb[0].index(cur_pg)]
     else:
-        i =0
-        if (len(last) < 20):
-            i = len(last)
-        else:
-            i = 20
-        x = randint(0, i -1)
-        return last[-x]
+        l = copy.copy(references)
+        l.reverse()
+        index_of_next_access = []
+        for x in tlb[0]: 
+            try:
+                next = l.index(x)
+                index_of_next_access.append(next)
+            except:
+                index_of_next_access.append(1000000000000000)
+        return [0, cur_pg, index_of_next_access.index(max(index_of_next_access))]
