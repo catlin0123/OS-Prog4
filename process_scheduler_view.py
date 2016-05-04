@@ -33,7 +33,9 @@ def clear_process_row(s_frame):
     ttk.Label(s_frame, text="Arrival Time").grid(row=0, column=3)
     
     global number_of_rows
+    global process_list
     number_of_rows = 0
+    process_list = []
     add_process_row(s_frame)
     
 
